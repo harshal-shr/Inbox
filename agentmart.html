@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AgentMart — AI Automation Marketplace</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+    --bg:#0F1418;
+    --surface:#161D22;
+    --surface-2:#1D262C;
+    --border:#28333A;
+    --text:#ECEFF1;
+    --text-muted:#8B9AA3;
+    --amber:#4C8DFF;
+    --amber-dim:#1F3A63;
+    --teal:#49D3C4;
+    --teal-dim:#1E4B47;
+    --danger:#E2604F;
+  }
+  html[data-theme="light"]{
+    --bg:#F5F3EF;
+    --surface:#FFFFFF;
+    --surface-2:#F0EEE9;
+    --border:#DDD8CE;
+    --text:#1B1B18;
+    --text-muted:#6B6A63;
+    --amber:#2563EB;
+    --amber-dim:#DCE7FB;
+    --teal:#0E8F80;
+    --teal-dim:#CDEDE7;
+    --danger:#C6402F;
+  }
+  html[data-theme="light"] .btn-amber{ color:#fff; }
+  html[data-theme="light"] .role-toggle input:checked + label{ color:#2563EB; }
+  *{box-sizing:border-box;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter',sans-serif;
+    min-height:100vh;
+  }
+  h1,h2,h3,h4,.brand,.btn,.nav-tab,.tag,.label-mono{
+    font-family:'Space Grotesk',sans-serif;
+  }
+  .mono{font-family:'JetBrains Mono',monospace;}
+  a{text-decoration:none;}
+
+  /* ---------- Top bar ---------- */
+  .topbar{
+    border-bottom:1px solid var(--border);
+    background:var(--surface);
+    backdrop-filter:blur(6px);
+    position:sticky;top:0;z-index:50;
+  }
+  .brand{font-weight:700;font-size:1.25rem;letter-spacing:-0.02em;color:var(--text);}
+  .brand span{color:var(--amber);}
+  .nav-tab{
+    color:var(--text-muted);
+    font-size:0.92rem;
+    font-weight:500;
+    padding:0.9rem 0;
+    margin-right:1.6rem;
+    border-bottom:2px solid transparent;
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  .nav-tab:hover{color:var(--text);}
+  .nav-tab.active{color:var(--text);border-bottom-color:var(--amber);}
+  .role-chip{
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.68rem;
+    padding:0.2rem 0.5rem;
+    border:1px solid var(--teal-dim);
+    color:var(--teal);
+    letter-spacing:0.04em;
+  }
+  .role-chip.client{border-color:var(--amber-dim);color:var(--amber);}
+
+  /* ---------- Buttons ---------- */
+  .btn-amber{
+    background:var(--amber);
+    border:1px solid var(--amber);
+    color:#FFFFFF;
+    font-weight:600;
+    border-radius:3px;
+    padding:0.55rem 1.2rem;
+  }
+  .btn-amber:hover{background:#6FA0FF;color:#FFFFFF;}
+  .btn-outline-line{
+    background:transparent;
+    border:1px solid var(--border);
+    color:var(--text);
+    border-radius:3px;
+  }
+  .btn-outline-line:hover{border-color:var(--amber);color:var(--amber);}
+  .btn-ghost{
+    background:transparent;border:none;color:var(--text-muted);
+  }
+  .btn-ghost:hover{color:var(--danger);}
+
+  /* ---------- Cards / surfaces ---------- */
+  .panel{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:4px;
+  }
+  .card-item{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-left:2px solid var(--border);
+    border-radius:4px;
+    padding:1.1rem 1.3rem;
+    transition:border-color .15s ease;
+  }
+  .card-item:hover{border-left-color:var(--amber);}
+  .card-item.dev-owned:hover{border-left-color:var(--teal);}
+
+  .status-tag{
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.65rem;
+    letter-spacing:0.04em;
+    padding:0.15rem 0.45rem;
+    border-radius:2px;
+  }
+  .status-open{background:var(--teal-dim);color:var(--teal);}
+  .status-booked{background:var(--amber-dim);color:var(--amber);}
+
+  .stack-chip{
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.72rem;
+    border:1px solid var(--border);
+    color:var(--text-muted);
+    padding:0.25rem 0.55rem;
+    border-radius:2px;
+    display:inline-block;
+    margin:0 0.35rem 0.35rem 0;
+  }
+  .filter-chip{
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.72rem;
+    border:1px solid var(--border);
+    color:var(--text-muted);
+    padding:0.3rem 0.7rem;
+    border-radius:2px;
+    cursor:pointer;
+    display:inline-block;
+    margin:0 0.4rem 0.4rem 0;
+  }
+  .filter-chip.active{border-color:var(--amber);color:var(--amber);}
+
+  /* ---------- Forms ---------- */
+  label{font-size:0.85rem;color:var(--text-muted);margin-bottom:0.3rem;font-weight:500;}
+  .form-control, .form-select{
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    color:var(--text);
+    border-radius:3px;
+  }
+  .form-control:focus, .form-select:focus{
+    background:var(--surface-2);
+    color:var(--text);
+    border-color:var(--amber);
+    box-shadow:0 0 0 3px rgba(232,163,61,0.15);
+  }
+  .form-control::placeholder{color:#5B6A72;}
+  .hint-box{
+    background:rgba(232,163,61,0.08);
+    border:1px solid var(--amber-dim);
+    color:var(--amber);
+    font-size:0.8rem;
+    padding:0.5rem 0.7rem;
+    border-radius:3px;
+  }
+  .role-toggle{
+    display:flex;border:1px solid var(--border);border-radius:3px;overflow:hidden;
+  }
+  .role-toggle label{
+    flex:1;text-align:center;padding:0.65rem 0.5rem;margin:0;cursor:pointer;
+    color:var(--text-muted);font-size:0.9rem;font-weight:600;
+    border-right:1px solid var(--border);
+  }
+  .role-toggle label:last-child{border-right:none;}
+  .role-toggle input{display:none;}
+  .role-toggle input:checked + label{background:var(--surface-2);color:var(--amber);}
+
+  /* ---------- Hero (landing) ---------- */
+  .hero{
+    padding:5rem 0 4rem;
+    border-bottom:1px solid var(--border);
+    background:
+      radial-gradient(circle at 85% 10%, rgba(232,163,61,0.10), transparent 45%),
+      radial-gradient(circle at 10% 90%, rgba(73,211,196,0.08), transparent 40%);
+  }
+  .hero h1{font-size:2.6rem;line-height:1.15;letter-spacing:-0.02em;}
+  .hero .lead-sub{color:var(--text-muted);font-size:1.05rem;max-width:520px;}
+  .node-line{
+    font-family:'JetBrains Mono',monospace;color:var(--teal);font-size:0.78rem;letter-spacing:0.04em;
+  }
+  .stat-block{border-left:2px solid var(--border);padding-left:0.9rem;}
+  .stat-num{font-family:'Space Grotesk',sans-serif;font-size:1.6rem;font-weight:700;}
+  .stat-label{color:var(--text-muted);font-size:0.78rem;}
+
+  .empty-state{
+    text-align:center;padding:3.5rem 1rem;color:var(--text-muted);
+  }
+  .lock-icon{font-size:2rem;}
+
+  .toast-banner{
+    position:fixed;bottom:1.2rem;left:50%;transform:translateX(-50%);
+    background:var(--surface-2);border:1px solid var(--teal);color:var(--text);
+    padding:0.65rem 1.2rem;border-radius:3px;font-size:0.88rem;z-index:100;
+    display:none;
+  }
+
+  ::-webkit-scrollbar{width:8px;}
+  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+
+  .view{display:none;}
+  .view.active{display:block;}
+
+  .section-head{
+    display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:1rem;
+    margin-bottom:1.4rem;
+  }
+  .section-head h2{font-size:1.35rem;margin-bottom:0.2rem;}
+  .section-head p{color:var(--text-muted);font-size:0.88rem;margin:0;}
+
+  footer.site-footer{
+    border-top:1px solid var(--border);color:var(--text-muted);font-size:0.8rem;
+    padding:1.2rem 0;margin-top:3rem;
+  }
+/* ---------- Fade-in animation ---------- */
+@keyframes fadeInUp{
+  from{opacity:0; transform:translateY(8px);}
+  to{opacity:1; transform:translateY(0);}
+}
+.fade-in{
+  opacity:0;
+  animation:fadeInUp 0.35s ease forwards;
+}
+
+/* ---------- Toast pop animation ---------- */
+.toast-banner.pop{
+  animation:toastPop 0.25s ease;
+}
+@keyframes toastPop{
+  0%{ transform:translateX(-50%) scale(0.9); opacity:0; }
+  100%{ transform:translateX(-50%) scale(1); opacity:1; }
+}
+
+/* ---------- Inbox: conversation list + chat bubbles ---------- */
+.conv-row{
+  padding:0.75rem 1rem;
+  border-bottom:1px solid var(--border);
+  cursor:pointer;
+}
+.conv-row:hover{ background:var(--surface-2); }
+.conv-row.active{ background:var(--surface-2); border-left:2px solid var(--amber); }
+
+.chat-bubble{
+  max-width:75%;
+  padding:0.5rem 0.85rem;
+  border-radius:10px;
+  margin-bottom:0.6rem;
+  font-size:0.9rem;
+  word-wrap:break-word;
+}
+.chat-bubble.mine{
+  background:var(--amber-dim);
+  color:var(--text);
+  margin-left:auto;
+  border-bottom-right-radius:2px;
+}
+html[data-theme="light"] .chat-bubble.mine{ background:#DCE7FB; }
+.chat-bubble.theirs{
+  background:var(--surface-2);
+  border:1px solid var(--border);
+  margin-right:auto;
+  border-bottom-left-radius:2px;
+}
+
+/* ---------- Responsive fixes ---------- */
+@media (max-width: 767px){
+  .hero h1{ font-size:1.9rem; }
+  .hero{ padding:3rem 0 2.5rem; }
+  .section-head{ flex-direction:column; align-items:stretch; }
+  .section-head button{ width:100%; }
+  #tab-inbox .row.g-0{ flex-direction:column; }
+  #tab-inbox .col-4, #tab-inbox .col-8{
+    width:100%; max-width:100%; height:auto !important;
+  }
+  #tab-inbox .col-4{ max-height:180px; border-right:none !important; border-bottom:1px solid var(--border); }
+  #chat-window{ height:360px !important; }
+  .topbar .container{ gap:0.5rem; }
+  .nav-tab{ margin-right:1rem; font-size:0.85rem; }
+  .card-item .d-flex.gap-2{ flex-wrap:wrap; }
+}
+
+/* ---------- Password show/hide ---------- */
+.password-wrap{ position:relative; }
+.password-wrap input{ padding-right:2.6rem; }
+.password-eye{
+  position:absolute; right:0.8rem; top:50%; transform:translateY(-50%);
+  cursor:pointer; font-size:0.95rem; user-select:none; opacity:0.8;
+}
+.password-eye:hover{ opacity:1; }
+
+</style>
+</head>
+<body>
+
+<!-- ============ LANDING ============ -->
+<section class="view" id="view-landing">
+<div class="topbar">
+  <div class="container d-flex justify-content-between align-items-center py-2">
+    <span class="brand py-2">agent<span>mart</span></span>
+    <div class="d-flex align-items-center gap-2">
+      <button class="btn-ghost small" onclick="toggleTheme()" title="Toggle theme" id="theme-btn-landing">🌙</button>
+      <a class="btn btn-outline-line btn-sm" href="#auth" onclick="pendingAuthMode='login'">Sign In</a>
+      <a class="btn btn-amber btn-sm" href="#auth" onclick="pendingAuthMode='register'">Get Started</a>
+    </div>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="container">
+    <div class="row align-items-center g-4">
+      <div class="col-lg-7">
+        <div class="node-line mb-3">// build.deploy.acquire</div>
+        <h1 class="mb-3">The marketplace where <span style="color:var(--amber)">AI automations</span> meet real businesses.</h1>
+        <p class="lead-sub mb-4">AgentMart connects AI Developers who build automation agents with Business Clients who need repetitive work automated — no middlemen, no guesswork.</p>
+        <div class="d-flex gap-3 flex-wrap">
+          <a class="btn btn-amber" href="#auth" onclick="pendingAuthMode='register'">Get Started — It's Free</a>
+          <a class="btn btn-outline-line" href="#auth" onclick="pendingAuthMode='login'">I already have an account</a>
+        </div>
+        <div class="row mt-5 g-4">
+          <div class="col-4">
+            <div class="stat-block">
+              <div class="stat-num">2</div>
+              <div class="stat-label">Roles supported</div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="stat-block">
+              <div class="stat-num">100%</div>
+              <div class="stat-label">Client-driven briefs</div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="stat-block">
+              <div class="stat-num">0₹</div>
+              <div class="stat-label">Setup cost</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-5">
+        <div class="panel p-4">
+          <div class="mono small text-muted mb-2">// how it works</div>
+          <div class="d-flex gap-3 mb-3">
+            <span class="stack-chip">01</span>
+            <div>
+              <div class="fw-semibold small">Register your role</div>
+              <div class="text-muted small">Sign up as an AI Developer or a Business Client.</div>
+            </div>
+          </div>
+          <div class="d-flex gap-3 mb-3">
+            <span class="stack-chip">02</span>
+            <div>
+              <div class="fw-semibold small">Post or browse</div>
+              <div class="text-muted small">Clients post needs. Developers publish ready systems.</div>
+            </div>
+          </div>
+          <div class="d-flex gap-3">
+            <span class="stack-chip">03</span>
+            <div>
+              <div class="fw-semibold small">Connect &amp; deploy</div>
+              <div class="text-muted small">Message directly, book the work, get it automated.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</section>
+
+<!-- ============ AUTH (login / register) ============ -->
+<section class="view" id="view-auth">
+<div class="container" style="max-width:460px; padding-top:2.5rem;">
+  <div class="text-center mb-4">
+    <a href="#index" style="text-decoration:none;">
+      <span class="brand">agent<span>mart</span></span>
+    </a>
+    <div class="node-line mt-2">// build.deploy.acquire</div>
+  </div>
+
+  <div class="panel p-4">
+    <!-- Login -->
+    <div id="auth-login">
+      <h2 class="h4 mb-1">Welcome back</h2>
+      <p class="text-muted small mb-4">Sign in to your workspace.</p>
+      <div class="mb-3">
+        <label>Email address</label>
+        <input type="email" class="form-control" id="login-email" placeholder="you@company.com">
+      </div>
+      <div class="mb-4">
+        <label>Password</label>
+        <div class="password-wrap">
+          <input type="password" class="form-control" id="login-password" placeholder="••••••••">
+          <span class="password-eye" onclick="togglePasswordVisibility('login-password', this)">👁</span>
+        </div>
+      </div>
+      <button class="btn btn-amber w-100" onclick="handleLogin()">Sign In</button>
+      <p class="text-center mt-3 small">
+        <a href="#" style="color:var(--amber)" onclick="switchAuth('register');return false;">No account? Register here</a>
+      </p>
+    </div>
+
+    <!-- Register -->
+    <div id="auth-register" style="display:none;">
+      <h2 class="h4 mb-1">Create your account</h2>
+      <p class="text-muted small mb-3">Tell us how you'll use AgentMart.</p>
+
+      <label class="d-block mb-2">I am registering as</label>
+      <div class="role-toggle mb-3">
+        <input type="radio" name="reg-role" id="role-dev" value="developer" checked onchange="toggleRegRole()">
+        <label for="role-dev">AI Developer</label>
+        <input type="radio" name="reg-role" id="role-client" value="client" onchange="toggleRegRole()">
+        <label for="role-client">Business Client</label>
+      </div>
+
+      <div class="mb-3">
+        <label>Full name</label>
+        <input type="text" class="form-control" id="reg-name" placeholder="Your name">
+      </div>
+
+      <div class="mb-3" id="reg-company-wrap" style="display:none;">
+        <label>Company name</label>
+        <input type="text" class="form-control" id="reg-company" placeholder="e.g., Acme Automations Ltd.">
+      </div>
+
+      <div class="mb-3" id="reg-github-wrap">
+        <label>GitHub profile <span class="text-muted">(optional)</span></label>
+        <input type="text" class="form-control" id="reg-github" placeholder="https://github.com/username">
+        <div class="hint-box mt-2">Linking GitHub helps clients trust your deployment history.</div>
+      </div>
+
+      <div class="mb-3">
+        <label>LinkedIn profile <span class="text-muted">(optional)</span></label>
+        <input type="text" class="form-control" id="reg-linkedin" placeholder="https://linkedin.com/in/username">
+      </div>
+
+      <div class="mb-3">
+        <label>Email address</label>
+        <input type="email" class="form-control" id="reg-email" placeholder="you@company.com">
+      </div>
+
+      <div class="mb-4">
+        <label>Password</label>
+        <div class="password-wrap">
+          <input type="password" class="form-control" id="reg-password" placeholder="••••••••">
+          <span class="password-eye" onclick="togglePasswordVisibility('reg-password', this)">👁</span>
+        </div>
+      </div>
+
+      <button class="btn btn-amber w-100" onclick="handleRegister()">Create Account</button>
+      <p class="text-center mt-3 small">
+        <a href="#" style="color:var(--amber)" onclick="switchAuth('login');return false;">Already have an account? Sign in</a>
+      </p>
+    </div>
+
+    <hr style="border-color:var(--border)">
+    <div class="d-flex justify-content-between align-items-center small">
+      <span class="text-muted">Need help?</span>
+      <button class="btn btn-outline-line btn-sm" onclick="copySupport(this)">Copy support email</button>
+    </div>
+  </div>
+</div>
+
+</section>
+
+<!-- ============ APP (feed / needs / portal / inbox / profile) ============ -->
+<div id="app-shell" style="display:none;">
+<div class="topbar">
+  <div class="container d-flex justify-content-between align-items-center flex-wrap py-2">
+    <span class="brand py-2">agent<span>mart</span></span>
+    <div class="d-flex" style="overflow-x:auto;">
+      <a class="nav-tab" data-tab="feed" href="#feed">Systems Feed</a>
+      <a class="nav-tab" data-tab="needs" href="#needs">Business Needs</a>
+      <a class="nav-tab" data-tab="portal" href="#portal">Creator Portal</a>
+      <a class="nav-tab" data-tab="inbox" href="#inbox">Inbox</a>
+      <a class="nav-tab" data-tab="profile" href="#profile">Profile</a>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+      <button class="btn-ghost small" onclick="toggleTheme()" title="Toggle theme" id="theme-btn">🌙</button>
+      <span id="topbar-role" class="role-chip">DEVELOPER</span>
+      <button class="btn-ghost small" onclick="handleLogout()" title="Log out">⏻</button>
+    </div>
+  </div>
+</div>
+
+
+<section class="view" id="view-feed">
+<div class="container py-4">
+  <div class="section-head">
+    <div>
+      <h2>Explore AI Systems</h2>
+      <p>Production-ready automations published by developers on the network.</p>
+    </div>
+  </div>
+
+  <div class="panel p-3 mb-3">
+    <input type="text" class="form-control mb-3" id="feed-search" placeholder="Search systems by title or stack..." oninput="renderFeed()">
+    <div id="feed-filters"></div>
+  </div>
+
+  <div id="feed-list" class="row g-3"></div>
+</div>
+
+</section>
+
+<section class="view" id="view-needs">
+<div class="container py-4">
+  <div class="section-head">
+    <div>
+      <h2>Active Business Pipelines</h2>
+      <p>Operational bottlenecks posted directly by companies.</p>
+    </div>
+    <button class="btn btn-amber" id="post-req-btn" onclick="showPostRequirement()">+ Post Requirement</button>
+  </div>
+
+  <div class="panel p-3 mb-3">
+    <input type="text" class="form-control" id="needs-search" placeholder="Search requirements by title..." oninput="renderNeeds()">
+  </div>
+
+  <div id="post-req-form" class="panel p-4 mb-4" style="display:none;">
+    <h3 class="h6 mb-3">New requirement</h3>
+    <div class="mb-3">
+      <label>Title</label>
+      <input type="text" class="form-control" id="req-title" placeholder="e.g., Automate WhatsApp customer replies">
+    </div>
+    <div class="mb-3">
+      <label>Description</label>
+      <textarea class="form-control" id="req-desc" rows="3" placeholder="Describe the problem you need automated..."></textarea>
+    </div>
+    <div class="mb-3" style="max-width:200px;">
+      <label>Duration</label>
+      <select class="form-select" id="req-duration">
+        <option>1 week</option><option>2 weeks</option><option>3 weeks</option><option>1 month</option>
+      </select>
+    </div>
+    <button class="btn btn-amber" onclick="submitRequirement()" id="req-submit-btn">Publish Requirement</button>
+    <button class="btn btn-outline-line ms-2" onclick="cancelReqForm()">Cancel</button>
+  </div>
+
+  <div id="needs-list" class="d-flex flex-column gap-3"></div>
+</div>
+
+</section>
+
+<section class="view" id="view-portal">
+<div class="container py-4">
+  <div class="mx-auto" style="max-width:640px;">
+    <div id="portal-locked" class="panel empty-state" style="display:none;">
+      <div class="lock-icon mb-2">🔒</div>
+      <h3 class="h5">Access Restricted</h3>
+      <p class="text-muted">Only registered AI Developers can publish systems to the marketplace.</p>
+      <a class="btn btn-outline-line" href="#feed">Return to Systems Feed</a>
+    </div>
+
+    <div id="portal-form-wrap" class="panel p-4">
+      <h2 class="h4 mb-1">System Compiler Portal</h2>
+      <p class="text-muted small mb-4">Publish an automation directly to the marketplace index.</p>
+
+      <div class="mb-3">
+        <label class="form-label d-block">System title</label>
+        <input type="text" class="form-control" id="sys-title" placeholder="e.g., Autonomous Invoice Processing Agent">
+      </div>
+      <div class="row g-3 mb-3">
+        <div class="col-md-6">
+          <label class="form-label d-block">Live production URL / demo</label>
+          <input type="text" class="form-control" id="sys-url" placeholder="https://your-agent-space.app">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label d-block">Status</label>
+          <select class="form-select" id="sys-status">
+            <option value="open">Open to Acquire</option>
+            <option value="booked">Booked</option>
+          </select>
+        </div>
+      </div>
+      <div class="mb-3">
+        <label class="form-label d-block">Operational breakdown</label>
+        <textarea class="form-control" id="sys-desc" rows="3" placeholder="What does it do, how does it work, what problem does it solve..."></textarea>
+      </div>
+      <div class="mb-4">
+        <label class="form-label d-block">Stack components <span class="text-muted">(comma separated, optional)</span></label>
+        <input type="text" class="form-control" id="sys-stack" placeholder="e.g., OpenAI, LangChain, Python">
+      </div>
+      <button class="btn btn-amber w-100" onclick="publishSystem()">Publish System Listing</button>
+    </div>
+  </div>
+</div>
+
+</section>
+
+<section class="view" id="view-inbox">
+<div class="container py-4" id="tab-inbox">
+  <div class="section-head">
+    <div>
+      <h2>Inbox</h2>
+      <p>Direct conversations between developers and business clients.</p>
+    </div>
+  </div>
+  <div class="panel" style="min-height:420px;">
+    <div class="row g-0">
+      <div class="col-4 border-end" style="border-color:var(--border) !important; max-height:480px; overflow-y:auto;">
+        <div class="p-3 border-bottom" style="border-color:var(--border) !important;">
+          <span class="mono text-muted small">CONVERSATIONS</span>
+        </div>
+        <div id="conv-list"></div>
+      </div>
+      <div class="col-8 d-flex flex-column" style="height:480px;">
+        <div id="chat-empty" class="empty-state m-auto text-muted small mono">SELECT A CONVERSATION TO BEGIN</div>
+        <div id="chat-window" style="display:none; height:100%;" class="d-flex flex-column">
+          <div class="p-3 border-bottom fw-semibold" id="chat-with" style="border-color:var(--border) !important;"></div>
+          <div id="chat-messages" class="flex-grow-1 p-3" style="overflow-y:auto;"></div>
+          <div class="p-2 border-top d-flex gap-2" style="border-color:var(--border) !important;">
+            <input type="text" class="form-control" id="chat-input" placeholder="Type a message...">
+            <button class="btn btn-amber" onclick="sendMessage()">Send</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</section>
+
+<section class="view" id="view-profile">
+<div class="container py-4">
+  <div class="mx-auto" style="max-width:640px;">
+    <div class="panel p-4">
+      <div class="d-flex align-items-center gap-3 mb-4">
+        <div id="profile-avatar" style="width:56px;height:56px;border-radius:50%;background:var(--amber);color:#1A1200;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.2rem;flex-shrink:0;">HA</div>
+        <div>
+          <div id="profile-name-display" class="h5 mb-0">—</div>
+          <span id="profile-role-display" class="role-chip">DEVELOPER</span>
+        </div>
+      </div>
+
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label d-block">Full name</label>
+          <input type="text" class="form-control" id="profile-name">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label d-block">Username handle</label>
+          <input type="text" class="form-control" id="profile-handle" placeholder="e.g., dev_22">
+        </div>
+      </div>
+      <div class="mt-3">
+        <label class="form-label d-block">Avatar image URL <span class="text-muted">(optional)</span></label>
+        <input type="text" class="form-control" id="profile-avatar-url" placeholder="https://example.com/your-photo.jpg" oninput="previewAvatar()">
+      </div>
+      <div class="mt-3" id="profile-company-wrap" style="display:none;">
+        <label class="form-label d-block">Company name</label>
+        <input type="text" class="form-control" id="profile-company">
+      </div>
+      <div class="mt-3">
+        <label class="form-label d-block">Bio / pipeline focus</label>
+        <textarea class="form-control" id="profile-bio" rows="3" placeholder="Tell others what workflows you engineer..."></textarea>
+      </div>
+      <div class="row g-3 mt-1">
+        <div class="col-md-6">
+          <label class="form-label d-block">GitHub profile link</label>
+          <input type="text" class="form-control" id="profile-github">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label d-block">LinkedIn profile link</label>
+          <input type="text" class="form-control" id="profile-linkedin">
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center mt-4">
+        <button class="btn btn-outline-line" onclick="handleLogout()">Log out</button>
+        <button class="btn btn-amber" onclick="saveProfile()">Save Profile</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</section>
+</div>
+
+<footer class="site-footer">
+  <div class="container d-flex justify-content-between flex-wrap">
+    <span>© 2026 AgentMart</span>
+    <span>Support: harshalmohite28@gmail.com</span>
+  </div>
+</footer>
+
+
+<div class="toast-banner" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script>
+/* ===================== DATA LAYER (localStorage) ===================== */
+const DB_KEY = 'agentmart_db_v1';
+const THEME_KEY = 'agentmart_theme';
+const ACTIVE_CONV_KEY = 'agentmart_active_conv';
+const SUPPORT_EMAIL = 'harshalmohite28@gmail.com';
+
+function loadDB(){
+  let db = JSON.parse(localStorage.getItem(DB_KEY) || 'null');
+  if(!db){
+    db = {
+      users: [],
+      currentUserId: null,
+      systems: [
+        {id:'sys1', ownerId:'seed', ownerName:'Testing Desktop', title:'Lead Qualifier Agent', desc:'Scores inbound leads using CRM + email signals and routes hot leads to sales instantly.', url:'https://example.com/demo', status:'open', stack:['OpenAI','LangChain','Python']},
+        {id:'sys2', ownerId:'seed', ownerName:'Testing Desktop', title:'Support Ticket Triage Bot', desc:'Classifies and auto-tags incoming support tickets, drafts first-response replies.', url:'https://example.com/demo2', status:'open', stack:['OpenAI','Slack Bot']}
+      ],
+      needs: [
+        {id:'req1', ownerId:'seed', ownerName:'Acme Retail Co.', title:'Automate WhatsApp customer replies', desc:'Need an agent to auto-handle common WhatsApp customer questions (order status, returns).', duration:'3 weeks', status:'open'},
+        {id:'req2', ownerId:'seed', ownerName:'Northwind Logistics', title:'Invoice data extraction pipeline', desc:'Extract line-items from vendor invoice PDFs into our ERP automatically.', duration:'2 weeks', status:'open'}
+      ],
+      conversations: []   // { id, participants:[userIdA,userIdB], names:{id:name}, messages:[{from,text,ts}] }
+    };
+    saveDB(db);
+  }
+  if(!db.conversations) db.conversations = [];
+  return db;
+}
+function saveDB(db){ localStorage.setItem(DB_KEY, JSON.stringify(db)); }
+let db = loadDB();
+
+function currentUser(){
+  return db.users.find(u => u.id === db.currentUserId) || null;
+}
+function uid(){ return 'id_' + Math.random().toString(36).slice(2,10); }
+
+/* ===================== TOAST (jQuery animation) ===================== */
+function toast(msg){
+  const $t = $('#toast');
+  $t.stop(true, true).text(msg).fadeIn(200);
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(() => $t.fadeOut(400), 2200);
+}
+function copySupport(btn){
+  navigator.clipboard?.writeText(SUPPORT_EMAIL);
+  const $btn = $(btn);
+  const original = $btn.text();
+  $btn.text('✓ Copied!').prop('disabled', true);
+  setTimeout(() => $btn.text(original).prop('disabled', false), 1500);
+  toast('Support email copied: ' + SUPPORT_EMAIL);
+}
+
+/* ===================== THEME ===================== */
+function applyTheme(mode){
+  document.documentElement.setAttribute('data-theme', mode);
+  const icon = mode==='light' ? '☀️' : '🌙';
+  $('#theme-btn, #theme-btn-landing').text(icon);
+  localStorage.setItem(THEME_KEY, mode);
+}
+function toggleTheme(){
+  const current = localStorage.getItem(THEME_KEY) || 'dark';
+  applyTheme(current==='dark' ? 'light' : 'dark');
+}
+
+/* ===================== VALIDATION HELPERS ===================== */
+function isValidEmail(email){
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+/* ===================== AUTH (auth.html) ===================== */
+function switchAuth(which){
+  document.getElementById('auth-login').style.display = which==='login' ? 'block':'none';
+  document.getElementById('auth-register').style.display = which==='register' ? 'block':'none';
+}
+function toggleRegRole(){
+  const isClient = document.getElementById('role-client').checked;
+  document.getElementById('reg-company-wrap').style.display = isClient ? 'block':'none';
+  document.getElementById('reg-github-wrap').style.display = isClient ? 'none':'block';
+}
+function togglePasswordVisibility(inputId, eyeEl){
+  const input = document.getElementById(inputId);
+  const showing = input.type === 'text';
+  input.type = showing ? 'password' : 'text';
+  eyeEl.textContent = showing ? '👁' : '🙈';
+}
+
+function handleRegister(){
+  const role = document.querySelector('input[name="reg-role"]:checked').value;
+  const name = document.getElementById('reg-name').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const password = document.getElementById('reg-password').value;
+  const company = document.getElementById('reg-company').value.trim();
+  const github = document.getElementById('reg-github').value.trim();
+  const linkedin = document.getElementById('reg-linkedin').value.trim();
+
+  if(!name || !email || !password){ toast('Please fill all required fields.'); return; }
+  if(!isValidEmail(email)){ toast('Please enter a valid email address.'); return; }
+  if(password.length < 6){ toast('Password must be at least 6 characters.'); return; }
+  if(role==='client' && !company){ toast('Company name is required for business clients.'); return; }
+  if(db.users.some(u => u.email === email)){ toast('An account with this email already exists.'); return; }
+
+  const user = { id: uid(), role, name, email, password, company, github, linkedin, handle:'', bio:'', avatarUrl:'' };
+  db.users.push(user);
+  db.currentUserId = user.id;
+  saveDB(db);
+  go('feed');
+}
+
+function handleLogin(){
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  if(!email || !password){ toast('Please enter email and password.'); return; }
+  const user = db.users.find(u => u.email === email && u.password === password);
+  if(!user){ toast('Invalid email or password.'); return; }
+  db.currentUserId = user.id;
+  saveDB(db);
+  go('feed');
+}
+
+function handleLogout(){
+  db.currentUserId = null;
+  saveDB(db);
+  go('landing');
+}
+
+/* ===================== APP PAGE GUARD (feed/needs/portal/inbox/profile) =====================
+   Call at the top of every app page. Redirects to auth.html if not logged in,
+   fills the shared topbar, and highlights the current nav tab (all via jQuery). */
+function guardApp(pageName){
+  const u = currentUser();
+  if(!u){ go('auth'); return null; }
+  $('#topbar-role').text(u.role === 'developer' ? 'DEVELOPER' : 'CLIENT')
+                    .toggleClass('client', u.role === 'client');
+  $('.nav-tab').removeClass('active');
+  $('.nav-tab[data-tab="' + pageName + '"]').addClass('active');
+  return u;
+}
+
+/* Fades a freshly-rendered list of .card-item nodes in, staggered (jQuery animation) */
+function fadeInCards(containerSelector){
+  $(containerSelector).find('.card-item').hide().each(function(i){
+    $(this).delay(i * 40).fadeIn(300);
+  });
+}
+
+/* ===================== MESSAGING / INBOX ===================== */
+let activeConvId = localStorage.getItem(ACTIVE_CONV_KEY) || null;
+
+function findOrCreateConversation(otherId, otherName){
+  const u = currentUser();
+  let conv = db.conversations.find(c => c.participants.includes(u.id) && c.participants.includes(otherId));
+  if(!conv){
+    conv = { id: uid(), participants:[u.id, otherId], names:{[u.id]:u.name, [otherId]:otherName}, messages:[] };
+    db.conversations.push(conv);
+    saveDB(db);
+  }
+  return conv;
+}
+function contactOwner(ownerId, ownerName){
+  const u = currentUser();
+  if(ownerId === u.id){ toast('This is your own listing.'); return; }
+  const conv = findOrCreateConversation(ownerId, ownerName);
+  localStorage.setItem(ACTIVE_CONV_KEY, conv.id);
+  go('inbox');
+}
+function renderInbox(){
+  const u = currentUser();
+  const $list = $('#conv-list');
+  const myConvs = db.conversations.filter(c => c.participants.includes(u.id));
+  if(myConvs.length===0){
+    $list.html(`<div class="p-3 text-muted small">No conversations yet.</div>`);
+  } else {
+    $list.html(myConvs.map(c => {
+      const otherId = c.participants.find(p => p!==u.id);
+      const otherName = c.names[otherId] || 'Unknown';
+      const last = c.messages[c.messages.length-1];
+      return `<div class="conv-row ${activeConvId===c.id?'active':''}" onclick="openConversation('${c.id}')">
+        <div class="fw-semibold small">${escapeHtml(otherName)}</div>
+        <div class="text-muted small text-truncate">${last ? escapeHtml(last.text) : 'No messages yet'}</div>
+      </div>`;
+    }).join(''));
+  }
+  if(activeConvId) openConversation(activeConvId);
+}
+function openConversation(convId){
+  activeConvId = convId;
+  localStorage.setItem(ACTIVE_CONV_KEY, convId);
+  const u = currentUser();
+  const conv = db.conversations.find(c => c.id===convId);
+  if(!conv) return;
+  $('#chat-empty').hide();
+  $('#chat-window').css('display','flex');
+  const otherId = conv.participants.find(p => p!==u.id);
+  $('#chat-with').text(conv.names[otherId] || 'Unknown');
+  const $msgBox = $('#chat-messages');
+  $msgBox.html(conv.messages.map(m => `
+    <div class="chat-bubble ${m.from===u.id?'mine':'theirs'}">${escapeHtml(m.text)}</div>
+  `).join('') || `<div class="text-muted small">Say hello to start the conversation.</div>`);
+  $msgBox.scrollTop($msgBox[0].scrollHeight);
+  $('.conv-row').removeClass('active');
+}
+function sendMessage(){
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if(!text || !activeConvId) return;
+  const u = currentUser();
+  const conv = db.conversations.find(c => c.id===activeConvId);
+  conv.messages.push({from:u.id, text, ts:Date.now()});
+  saveDB(db);
+  input.value='';
+  renderInbox();
+}
+
+/* ===================== FEED ===================== */
+let activeFilters = new Set();
+const ALL_TAGS = ['OpenAI','LangChain','Python','Slack Bot','Database'];
+
+function renderFeedFilters(){
+  $('#feed-filters').html(ALL_TAGS.map(tag =>
+    `<span class="filter-chip ${activeFilters.has(tag)?'active':''}" onclick="toggleFilter('${tag}')">${tag}</span>`
+  ).join(''));
+}
+function toggleFilter(tag){
+  activeFilters.has(tag) ? activeFilters.delete(tag) : activeFilters.add(tag);
+  renderFeedFilters();
+  renderFeed();
+}
+
+function renderFeed(){
+  renderFeedFilters();
+  const u = currentUser();
+  const q = (document.getElementById('feed-search').value || '').toLowerCase();
+  let items = db.systems.filter(s => {
+    const matchesQ = !q || s.title.toLowerCase().includes(q) || s.stack.join(' ').toLowerCase().includes(q);
+    const matchesTags = activeFilters.size===0 || s.stack.some(t => activeFilters.has(t));
+    return matchesQ && matchesTags;
+  });
+
+  if(items.length===0){
+    $('#feed-list').html(`<div class="col-12"><div class="empty-state panel">No systems match your filters yet.</div></div>`);
+    return;
+  }
+
+  $('#feed-list').html(items.map((s) => {
+    const isOwner = u && s.ownerId === u.id;
+    return `
+    <div class="col-md-6">
+      <div class="card-item h-100">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <div>
+            <div class="fw-semibold">${escapeHtml(s.title)}</div>
+            <div class="text-muted small">By ${escapeHtml(s.ownerName)}</div>
+          </div>
+          <span class="status-tag ${s.status==='open'?'status-open':'status-booked'}">${s.status==='open'?'OPEN':'BOOKED'}</span>
+        </div>
+        <p class="small text-muted mb-2">${escapeHtml(s.desc || '')}</p>
+        <div class="mb-2">${s.stack.map(t=>`<span class="stack-chip">${escapeHtml(t)}</span>`).join('')}</div>
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+          ${s.url ? `<a href="${escapeAttr(s.url)}" target="_blank" class="small" style="color:var(--teal)">View demo →</a>` : '<span></span>'}
+          <div class="d-flex gap-2">
+            ${isOwner ? `
+              <button class="btn btn-outline-line btn-sm" onclick="deleteSystem('${s.id}')">Delete</button>
+            ` : `
+              <button class="btn btn-outline-line btn-sm" onclick="contactOwner('${s.ownerId}','${escapeAttr(s.ownerName)}')">Message</button>
+              ${s.status==='open' ? `<button class="btn btn-amber btn-sm" onclick="bookSystem('${s.id}')">Book Now</button>` : ''}
+            `}
+          </div>
+        </div>
+      </div>
+    </div>
+  `}).join(''));
+  fadeInCards('#feed-list');
+}
+function bookSystem(id){
+  const s = db.systems.find(x=>x.id===id);
+  if(!s) return;
+  s.status = 'booked';
+  saveDB(db);
+  renderFeed();
+  toast('System booked.');
+}
+function deleteSystem(id){
+  db.systems = db.systems.filter(s=>s.id!==id);
+  saveDB(db);
+  renderFeed();
+  toast('Listing deleted.');
+}
+
+/* ===================== BUSINESS NEEDS ===================== */
+function showPostRequirement(){ $('#post-req-form').slideDown(200); }
+function cancelReqForm(){
+  $('#post-req-form').slideUp(150);
+  document.getElementById('req-title').value='';
+  document.getElementById('req-desc').value='';
+}
+function submitRequirement(){
+  const title = document.getElementById('req-title').value.trim();
+  const desc = document.getElementById('req-desc').value.trim();
+  const duration = document.getElementById('req-duration').value;
+  if(!title || !desc){ toast('Please fill title and description.'); return; }
+  const u = currentUser();
+  db.needs.unshift({id:uid(), ownerId:u.id, ownerName:u.company || u.name, title, desc, duration, status:'open'});
+  saveDB(db);
+  cancelReqForm();
+  renderNeeds();
+  toast('Requirement published.');
+}
+function renderNeeds(){
+  const u = currentUser();
+  const isClient = u && u.role === 'client';
+  $('#post-req-btn').toggle(isClient);
+
+  const q = (document.getElementById('needs-search').value || '').toLowerCase();
+  const items = db.needs.filter(n => !q || n.title.toLowerCase().includes(q));
+
+  if(items.length===0){
+    $('#needs-list').html(`<div class="empty-state panel">No business requirements match your search.</div>`);
+    return;
+  }
+  $('#needs-list').html(items.map((n) => {
+    const isOwner = u && n.ownerId === u.id;
+    const isDev = u && u.role === 'developer';
+    return `
+    <div class="card-item">
+      <div class="d-flex justify-content-between align-items-start">
+        <div>
+          <div class="fw-semibold">${escapeHtml(n.title)}</div>
+          <div class="text-muted small mb-2">Posted by: ${escapeHtml(n.ownerName)}</div>
+        </div>
+        <span class="status-tag ${n.status==='open'?'status-open':'status-booked'}">${n.status==='open'?'OPEN TO BUILD':'BOOKED'}</span>
+      </div>
+      <p class="small text-muted mb-2">${escapeHtml(n.desc)}</p>
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <span class="stack-chip">Duration: ${escapeHtml(n.duration)}</span>
+        <div class="d-flex gap-2">
+          ${isOwner ? `
+            <button class="btn btn-outline-line btn-sm" onclick="deleteRequirement('${n.id}')">Delete</button>
+          ` : `
+            <button class="btn btn-outline-line btn-sm" onclick="contactOwner('${n.ownerId}','${escapeAttr(n.ownerName)}')">Message</button>
+            ${(isDev && n.status==='open') ? `<button class="btn btn-amber btn-sm" onclick="bookRequirement('${n.id}')">Take This</button>` : ''}
+          `}
+        </div>
+      </div>
+    </div>
+  `}).join(''));
+  fadeInCards('#needs-list');
+}
+function bookRequirement(id){
+  const n = db.needs.find(x=>x.id===id);
+  if(!n) return;
+  n.status='booked';
+  saveDB(db);
+  renderNeeds();
+  toast('Requirement marked as booked.');
+}
+function deleteRequirement(id){
+  db.needs = db.needs.filter(n=>n.id!==id);
+  saveDB(db);
+  renderNeeds();
+  toast('Requirement deleted.');
+}
+
+/* ===================== CREATOR PORTAL ===================== */
+function renderPortal(){
+  const u = currentUser();
+  const isDev = u.role === 'developer';
+  $('#portal-locked').toggle(!isDev);
+  $('#portal-form-wrap').toggle(isDev);
+}
+function publishSystem(){
+  const u = currentUser();
+  const title = document.getElementById('sys-title').value.trim();
+  const url = document.getElementById('sys-url').value.trim();
+  const status = document.getElementById('sys-status').value;
+  const desc = document.getElementById('sys-desc').value.trim();
+  const stackRaw = document.getElementById('sys-stack').value.trim();
+  if(!title || !url || !desc){ toast('Please fill all required fields.'); return; }
+  const stack = stackRaw ? stackRaw.split(',').map(s=>s.trim()).filter(Boolean) : [];
+  db.systems.unshift({id:uid(), ownerId:u.id, ownerName:u.name, title, url, status, desc, stack});
+  saveDB(db);
+  ['sys-title','sys-url','sys-desc','sys-stack'].forEach(id => document.getElementById(id).value='');
+  toast('System published to marketplace.');
+  go('feed');
+}
+
+/* ===================== PROFILE ===================== */
+function renderProfile(){
+  const u = currentUser();
+  if(!u) return;
+  document.getElementById('profile-name').value = u.name || '';
+  document.getElementById('profile-handle').value = u.handle || '';
+  document.getElementById('profile-avatar-url').value = u.avatarUrl || '';
+  document.getElementById('profile-bio').value = u.bio || '';
+  document.getElementById('profile-github').value = u.github || '';
+  document.getElementById('profile-linkedin').value = u.linkedin || '';
+  document.getElementById('profile-company').value = u.company || '';
+  $('#profile-company-wrap').toggle(u.role==='client');
+  $('#profile-name-display').text(u.name);
+  $('#profile-role-display').text(u.role==='developer' ? 'AI DEVELOPER' : 'BUSINESS CLIENT')
+                              .toggleClass('client', u.role==='client');
+
+  const $avatar = $('#profile-avatar');
+  const liveUrl = (u.avatarUrl||'').trim();
+  if(liveUrl){
+    $avatar.css({backgroundImage:`url('${liveUrl.replace(/'/g,"")}')`, backgroundSize:'cover', backgroundPosition:'center'}).text('');
+  } else {
+    $avatar.css('backgroundImage','none').text((u.name||'??').slice(0,2).toUpperCase());
+  }
+}
+function saveProfile(){
+  const u = currentUser();
+  u.name = document.getElementById('profile-name').value.trim() || u.name;
+  u.handle = document.getElementById('profile-handle').value.trim();
+  u.avatarUrl = document.getElementById('profile-avatar-url').value.trim();
+  u.bio = document.getElementById('profile-bio').value.trim();
+  u.github = document.getElementById('profile-github').value.trim();
+  u.linkedin = document.getElementById('profile-linkedin').value.trim();
+  if(u.role==='client') u.company = document.getElementById('profile-company').value.trim();
+  saveDB(db);
+  renderProfile();
+  toast('Profile saved.');
+}
+
+/* ===================== UTIL ===================== */
+function escapeHtml(str){
+  return (str||'').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+function escapeAttr(str){ return escapeHtml(str); }
+
+/* ===================== INIT (runs on every page) ===================== */
+$(function(){
+  applyTheme(localStorage.getItem(THEME_KEY) || 'dark');
+  if(document.getElementById('role-dev')) toggleRegRole();
+});
+
+/* ===================== AVATAR LIVE PREVIEW (no field reset while typing) ===================== */
+function previewAvatar(){
+  const url = document.getElementById('profile-avatar-url').value.trim();
+  const name = document.getElementById('profile-name').value || '??';
+  const $a = $('#profile-avatar');
+  if(url){ $a.css({backgroundImage:`url('${url.replace(/'/g,"")}')`, backgroundSize:'cover', backgroundPosition:'center'}).text(''); }
+  else { $a.css('backgroundImage','none').text(name.slice(0,2).toUpperCase()); }
+}
+
+/* ===================== ROUTER (single-page navigation) ===================== */
+const APP_VIEWS = ['feed','needs','portal','inbox','profile'];
+const RENDERERS = { feed:()=>renderFeed(), needs:()=>renderNeeds(), portal:()=>renderPortal(), inbox:()=>renderInbox(), profile:()=>renderProfile() };
+let pendingAuthMode = 'login';
+
+function go(name){ if(location.hash === '#'+name) showView(name); else location.hash = name; }
+function resolveRoute(name){
+  if(APP_VIEWS.includes(name)) return currentUser() ? name : 'auth';
+  if(name==='auth') return currentUser() ? 'feed' : 'auth';
+  return 'landing';
+}
+function showView(name){
+  const target = resolveRoute(name);
+  if(target !== name){ location.replace('#'+target); return; }
+  const isApp = APP_VIEWS.includes(name);
+  $('.view').removeClass('active');
+  $('#view-'+name).addClass('active');
+  $('#app-shell').toggle(isApp);
+  if(name==='auth'){ switchAuth(pendingAuthMode); pendingAuthMode='login'; }
+  if(isApp && guardApp(name)) RENDERERS[name]();
+  window.scrollTo(0,0);
+}
+window.addEventListener('hashchange', () => showView(location.hash.slice(1)));
+$(function(){ showView(location.hash.slice(1) || (currentUser() ? 'feed' : 'landing')); });
+
+</script>
+</body>
+</html>
